@@ -1,4 +1,4 @@
-﻿using Othello.Player;
+﻿using Othello.Players;
 using System;
 using System;
 using System.Collections.Generic;

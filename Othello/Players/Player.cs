@@ -1,4 +1,4 @@
-﻿using Othello.Model;
+﻿using Othello.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
