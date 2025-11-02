@@ -1,9 +1,0 @@
-﻿<Window x:Class="Othello.WinnerDialog"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Winner" Height="150" Width="300">
-    <StackPanel Margin="12" VerticalAlignment="Center">
-        <TextBlock Name="Message" FontWeight="Bold" FontSize="16" TextAlignment="Center"/>
-        <Button Click="Close_Click" Margin="8" HorizontalAlignment="Center" Width="80">Close</Button>
-    </StackPanel>
-</Window>

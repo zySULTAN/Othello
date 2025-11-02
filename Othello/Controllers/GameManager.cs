@@ -1,7 +1,6 @@
 ﻿using Othello.Models;
 using Othello.Players;
 using System;
-using System.Collections.Generic;
 
 namespace Othello.Controllers
 {
@@ -52,8 +51,7 @@ namespace Othello.Controllers
             var move = CurrentPlayer.RequestMove(Board.Copy(), valid);
             if (move == null) return false;
 
-            var p = move.Value;
-            Board.PlaceDisk(p.Row, p.Col, CurrentPlayer.Disk);
+            if (!Board.ApplyMove(move.Value, CurrentPlayer.Disk)) return false;
 
             UpdateScores();
             BoardUpdated?.Invoke();
@@ -94,11 +92,7 @@ namespace Othello.Controllers
             {
                 for (int c = 0; c < GameBoard.Size; c++)
                 {
-                    if (Board.GetDisk(r, c) == null)
-                    {
-                        hasEmpty = true;
-                        break;
-                    }
+                    if (Board.GetDisk(r, c) == null) { hasEmpty = true; break; }
                 }
                 if (hasEmpty) break;
             }
