@@ -8,5 +8,6 @@ namespace Othello.Model
 {
     internal class GameBoard
     {
+
     }
 }
