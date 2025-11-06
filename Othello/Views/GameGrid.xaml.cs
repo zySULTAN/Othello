@@ -1,10 +1,9 @@
-using Othello.Models;
-using Othello.Players;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Othello.Models;
 
 namespace Othello.Views
 {
@@ -23,28 +22,54 @@ namespace Othello.Views
             GridBoard.Rows = GameBoard.Size;
             GridBoard.Columns = GameBoard.Size;
 
-            for (int r = 0; r < GameBoard.Size; r++)
+            for (int i = 0; i < GameBoard.Size; i++)
             {
-                for (int c = 0; c < GameBoard.Size; c++)
+                for (int j = 0; j < GameBoard.Size; j++)
                 {
-                    var btn = new Button { Margin = new Thickness(1) };
-                    btn.Background = (r + c) % 2 == 0 ? Brushes.DarkGreen : Brushes.ForestGreen;
-                    int rr = r, cc = c;
-                    btn.Click += (s, e) => TileClicked?.Invoke(rr, cc);
+                    Button btn = new Button();
+                    btn.Margin = new Thickness(1);
 
-                    var disk = board.GetDisk(r, c);
+                    if ((i + j) % 2 == 0)
+                        btn.Background = Brushes.DarkGreen;
+                    else
+                        btn.Background = Brushes.ForestGreen;
+
+                    btn.Tag = new Tuple<int, int>(i, j);
+                    btn.Click += Button_Click;
+
+                    string disk = board.GetDisk(i, j);
+
                     if (disk != null)
                     {
-                        var ellipse = new Ellipse { Width = 28, Height = 28 };
-                        ellipse.Fill = disk == DiskColor.Black ? Brushes.Black : Brushes.White;
-                        ellipse.Stroke = Brushes.Black;
-                        ellipse.HorizontalAlignment = HorizontalAlignment.Center;
-                        ellipse.VerticalAlignment = VerticalAlignment.Center;
-                        btn.Content = ellipse;
+                        Ellipse el = new Ellipse();
+                        el.Width = 28;
+                        el.Height = 28;
+                        el.Stroke = Brushes.Black;
+                        el.HorizontalAlignment = HorizontalAlignment.Center;
+                        el.VerticalAlignment = VerticalAlignment.Center;
+
+                        if (disk == "Black") el.Fill = Brushes.Black;
+                        else el.Fill = Brushes.White;
+
+                        btn.Content = el;
                     }
 
                     GridBoard.Children.Add(btn);
                 }
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            if (btn == null) return;
+
+            Tuple<int, int> tag = btn.Tag as Tuple<int, int>;
+            if (tag == null) return;
+
+            if (TileClicked != null)
+            {
+                TileClicked(tag.Item1, tag.Item2);
             }
         }
     }

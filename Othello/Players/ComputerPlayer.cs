@@ -1,29 +1,24 @@
-﻿using Othello.Models;
-using System;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Othello.Players
+namespace Othello.Models
 {
     public class ComputerPlayer : Player
     {
-        private static Random random = new Random();
+        private static readonly Random rng = new Random();
 
-        public ComputerPlayer(string name, DiskColor disk) : base(name, disk)
+        public ComputerPlayer(string name, string color) : base(name, color)
         {
         }
 
-        public override Position? RequestMove(GameBoard boardCopy, List<Position> validMoves)
+        public override Move? RequestMove(GameBoard board, List<Move> validMoves)
         {
-            if (validMoves == null || validMoves.Count == 0)
-                return null;
+            if (validMoves == null) return null;
+            if (validMoves.Count == 0) return null;
 
-            int index = random.Next(validMoves.Count);
-            return validMoves[index];
+            int index = rng.Next(validMoves.Count);
+            Move move = validMoves[index];
+            return move;
         }
     }
 }

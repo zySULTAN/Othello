@@ -1,36 +1,30 @@
-﻿using Othello.Models;
-using System;
-using System;
-using System.Collections.Generic;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Othello.Players
+namespace Othello.Models
 {
     public class HumanPlayer : Player
     {
-        private Position? chosenMove;
+        private Move? chosen;
 
-        public HumanPlayer(string name, DiskColor disk) : base(name, disk)
+        public HumanPlayer(string name, string color) : base(name, color)
         {
-            chosenMove = null;
+            chosen = null;
         }
 
-        public void SetChosenMove(Position move)
+        public void SetChosenMove(Move m)
         {
-            chosenMove = move;
+            chosen = m;
         }
 
-        public override Position? RequestMove(GameBoard boardCopy, List<Position> validMoves)
+        public override Move? RequestMove(GameBoard board, List<Move> validMoves)
         {
-            if (chosenMove != null && validMoves.Contains(chosenMove.Value))
+            if (chosen != null && validMoves.Contains(chosen.Value))
             {
-                var move = chosenMove;
-                chosenMove = null;
-                return move;
+                Move result = chosen.Value;
+                chosen = null;
+                return result;
             }
+
             return null;
         }
     }

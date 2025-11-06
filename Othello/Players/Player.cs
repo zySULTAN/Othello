@@ -1,42 +1,18 @@
-﻿using Othello.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Othello.Players
+namespace Othello.Models
 {
-    public enum DiskColor
-    {
-        Black,
-        White
-    }
-
-    public struct Position
-    {
-        public int Row { get; set; }
-        public int Col { get; set; }
-
-        public Position(int row, int col)
-        {
-            Row = row;
-            Col = col;
-        }
-    }
-
     public abstract class Player
     {
         public string Name { get; set; }
-        public DiskColor Disk { get; set; }
+        public string Color { get; set; }
 
-        public Player(string name, DiskColor disk)
+        protected Player(string name, string color)
         {
             Name = name;
-            Disk = disk;
+            Color = color;
         }
 
-        public abstract Position? RequestMove(GameBoard boardCopy, List<Position> validMoves);
+        public abstract Move? RequestMove(GameBoard board, List<Move> validMoves);
     }
 }

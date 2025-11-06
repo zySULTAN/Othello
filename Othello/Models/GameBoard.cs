@@ -1,117 +1,150 @@
-﻿using Othello.Players;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Othello.Models
 {
+    public struct Move
+    {
+        public int I;
+        public int J;
+        public Move(int i, int j)
+        {
+            I = i;
+            J = j;
+        }
+    }
+
     public class GameBoard
     {
         public const int Size = 8;
-        private DiskColor?[,] board;
-
-        private static readonly (int dr, int dc)[] Dirs = new (int, int)[]
-        {
-            (-1,-1), (-1,0), (-1,1),
-            (0,-1),          (0,1),
-            (1,-1),  (1,0),  (1,1)
-        };
+        private string[,] board;
 
         public GameBoard()
         {
-            board = new DiskColor?[Size, Size];
-            InitializeBoard();
+            board = new string[Size, Size];
+            Reset();
         }
 
-        public void InitializeBoard()
+        public void Reset()
         {
-            for (int r = 0; r < Size; r++)
-                for (int c = 0; c < Size; c++)
-                    board[r, c] = null;
+            for (int i = 0; i < Size; i++)
+                for (int j = 0; j < Size; j++)
+                    board[i, j] = null;
 
-            int m = Size / 2;
-            board[m - 1, m - 1] = DiskColor.White;
-            board[m, m] = DiskColor.White;
-            board[m - 1, m] = DiskColor.Black;
-            board[m, m - 1] = DiskColor.Black;
+            int mid = Size / 2;
+            board[mid - 1, mid - 1] = "White";
+            board[mid, mid] = "White";
+            board[mid - 1, mid] = "Black";
+            board[mid, mid - 1] = "Black";
         }
 
-        public DiskColor? GetDisk(int row, int col)
+        public string GetDisk(int i, int j)
         {
-            if (row < 0 || row >= Size || col < 0 || col >= Size) return null;
-            return board[row, col];
+            if (!Inside(i, j)) return null;
+            return board[i, j];
         }
 
-        public List<Position> GetValidMoves(DiskColor color)
+        public List<Move> GetValidMoves(string color)
         {
-            var list = new List<Position>();
-            for (int r = 0; r < Size; r++)
+            var moves = new List<Move>();
+
+            for (int i = 0; i < Size; i++)
             {
-                for (int c = 0; c < Size; c++)
+                for (int j = 0; j < Size; j++)
                 {
-                    if (board[r, c] != null) continue;
-                    if (CapturesInAnyDir(r, c, color))
-                        list.Add(new Position(r, c));
+                    if (board[i, j] != null) continue;
+
+                    if (CanCapture(i, j, color))
+                        moves.Add(new Move(i, j));
                 }
             }
-            return list;
+
+            return moves;
         }
 
-        public bool ApplyMove(Position p, DiskColor color)
+        public bool ApplyMove(int i, int j, string color)
         {
-            if (p.Row < 0 || p.Row >= Size || p.Col < 0 || p.Col >= Size) return false;
-            if (board[p.Row, p.Col] != null) return false;
-            bool any = false;
-            foreach (var dir in Dirs)
-            {
-                var toFlip = CollectFlipsInDir(p.Row, p.Col, color, dir.dr, dir.dc);
-                if (toFlip.Count > 0)
-                {
-                    any = true;
-                    foreach (var (rr, cc) in toFlip)
-                        board[rr, cc] = color;
-                }
-            }
-            if (!any) return false;
-            board[p.Row, p.Col] = color;
+            if (!Inside(i, j)) return false;
+            if (board[i, j] != null) return false;
+
+            bool flipped = false;
+
+            // Gå åt alla åtta riktningar
+            flipped |= FlipDirection(i, j, color, -1, 0);   // upp
+            flipped |= FlipDirection(i, j, color, 1, 0);    // ned
+            flipped |= FlipDirection(i, j, color, 0, -1);   // vänster
+            flipped |= FlipDirection(i, j, color, 0, 1);    // höger
+            flipped |= FlipDirection(i, j, color, -1, -1);  // upp-vänster
+            flipped |= FlipDirection(i, j, color, -1, 1);   // upp-höger
+            flipped |= FlipDirection(i, j, color, 1, -1);   // ned-vänster
+            flipped |= FlipDirection(i, j, color, 1, 1);    // ned-höger
+
+            if (!flipped) return false;
+
+            board[i, j] = color;
             return true;
         }
 
-        public GameBoard Copy()
+        private bool CanCapture(int i, int j, string color)
         {
-            var copy = new GameBoard();
-            for (int r = 0; r < Size; r++)
-                for (int c = 0; c < Size; c++)
-                    copy.board[r, c] = board[r, c];
-            return copy;
-        }
+            // Testar alla 8 riktningar — enklare att läsa än arrayer
+            if (CountFlips(i, j, color, -1, 0) > 0) return true;
+            if (CountFlips(i, j, color, 1, 0) > 0) return true;
+            if (CountFlips(i, j, color, 0, -1) > 0) return true;
+            if (CountFlips(i, j, color, 0, 1) > 0) return true;
+            if (CountFlips(i, j, color, -1, -1) > 0) return true;
+            if (CountFlips(i, j, color, -1, 1) > 0) return true;
+            if (CountFlips(i, j, color, 1, -1) > 0) return true;
+            if (CountFlips(i, j, color, 1, 1) > 0) return true;
 
-        private bool CapturesInAnyDir(int r, int c, DiskColor me)
-        {
-            foreach (var (dr, dc) in Dirs)
-                if (CollectFlipsInDir(r, c, me, dr, dc).Count > 0)
-                    return true;
             return false;
         }
 
-        private List<(int r, int c)> CollectFlipsInDir(int r, int c, DiskColor me, int dr, int dc)
+        private int CountFlips(int i, int j, string color, int di, int dj)
         {
-            var flips = new List<(int, int)>();
-            int rr = r + dr, cc = c + dc;
-            var opp = me == DiskColor.Black ? DiskColor.White : DiskColor.Black;
+            string opp = (color == "Black") ? "White" : "Black";
+            int ii = i + di;
+            int jj = j + dj;
+            int count = 0;
 
-            if (!In(rr, cc) || board[rr, cc] != opp) return flips;
+            // första måste vara motståndare
+            if (!Inside(ii, jj) || board[ii, jj] != opp)
+                return 0;
 
-            while (In(rr, cc) && board[rr, cc] == opp)
+            while (Inside(ii, jj) && board[ii, jj] == opp)
             {
-                flips.Add((rr, cc));
-                rr += dr; cc += dc;
+                count++;
+                ii += di;
+                jj += dj;
             }
 
-            if (!In(rr, cc)) return new List<(int, int)>();
-            if (board[rr, cc] != me) return new List<(int, int)>();
-            return flips;
+            if (!Inside(ii, jj)) return 0;
+            if (board[ii, jj] != color) return 0;
+
+            return count;
         }
 
-        private bool In(int r, int c) => r >= 0 && r < Size && c >= 0 && c < Size;
+        private bool FlipDirection(int i, int j, string color, int di, int dj)
+        {
+            int flips = CountFlips(i, j, color, di, dj);
+            if (flips == 0) return false;
+
+            int ii = i + di;
+            int jj = j + dj;
+
+            for (int k = 0; k < flips; k++)
+            {
+                board[ii, jj] = color;
+                ii += di;
+                jj += dj;
+            }
+
+            return true;
+        }
+
+        private bool Inside(int i, int j)
+        {
+            return i >= 0 && i < Size && j >= 0 && j < Size;
+        }
     }
 }

@@ -2,12 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:Othello.Views"
-        Title="Othello" Width="600" Height="720" WindowStartupLocation="CenterScreen">
+        Title="Othello" Width="720" Height="720" WindowStartupLocation="CenterScreen">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8">
             <Button x:Name="BtnNewGame" Content="New Game" Width="100" Margin="0,0,8,0" Click="BtnNewGame_Click"/>
             <Button x:Name="BtnExit" Content="Exit" Width="80" Click="BtnExit_Click"/>
-            <TextBlock Text="   " />
             <TextBlock Text="Current: " VerticalAlignment="Center"/>
             <TextBlock x:Name="TxtCurrent" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
         </StackPanel>
