@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Othello.Models
 {
+    // Represents a move on the game board
     public struct Move
     {
         public int I;
@@ -19,12 +20,14 @@ namespace Othello.Models
         public const int Size = 8;
         private string[,] board;
 
+        // Initializes a new game board and sets up the starting position
         public GameBoard()
         {
             board = new string[Size, Size];
             Reset();
         }
 
+        // Resets the board to the initial game state
         public void Reset()
         {
             for (int i = 0; i < Size; i++)
@@ -38,12 +41,14 @@ namespace Othello.Models
             board[mid, mid - 1] = "Black";
         }
 
+        // Gets the disk color at the specified position, or null if empty
         public string GetDisk(int i, int j)
         {
             if (!Inside(i, j)) return null;
             return board[i, j];
         }
 
+        // Returns a list of valid moves for the given color
         public List<Move> GetValidMoves(string color)
         {
             var moves = new List<Move>();
@@ -62,6 +67,7 @@ namespace Othello.Models
             return moves;
         }
 
+        // Applies a move for the given color at the specified position
         public bool ApplyMove(int i, int j, string color)
         {
             if (!Inside(i, j)) return false;
@@ -69,15 +75,14 @@ namespace Othello.Models
 
             bool flipped = false;
 
-            // Gå åt alla åtta riktningar
-            flipped |= FlipDirection(i, j, color, -1, 0);   // upp
-            flipped |= FlipDirection(i, j, color, 1, 0);    // ned
-            flipped |= FlipDirection(i, j, color, 0, -1);   // vänster
-            flipped |= FlipDirection(i, j, color, 0, 1);    // höger
-            flipped |= FlipDirection(i, j, color, -1, -1);  // upp-vänster
-            flipped |= FlipDirection(i, j, color, -1, 1);   // upp-höger
-            flipped |= FlipDirection(i, j, color, 1, -1);   // ned-vänster
-            flipped |= FlipDirection(i, j, color, 1, 1);    // ned-höger
+            flipped |= FlipDirection(i, j, color, -1, 0);
+            flipped |= FlipDirection(i, j, color, 1, 0);  
+            flipped |= FlipDirection(i, j, color, 0, -1);
+            flipped |= FlipDirection(i, j, color, 0, 1);
+            flipped |= FlipDirection(i, j, color, -1, -1);
+            flipped |= FlipDirection(i, j, color, -1, 1);
+            flipped |= FlipDirection(i, j, color, 1, -1);
+            flipped |= FlipDirection(i, j, color, 1, 1);
 
             if (!flipped) return false;
 
@@ -85,9 +90,10 @@ namespace Othello.Models
             return true;
         }
 
+        // Checks if placing a disk at (i, j) can capture opponent disks
         private bool CanCapture(int i, int j, string color)
         {
-            // Testar alla 8 riktningar — enklare att läsa än arrayer
+            
             if (CountFlips(i, j, color, -1, 0) > 0) return true;
             if (CountFlips(i, j, color, 1, 0) > 0) return true;
             if (CountFlips(i, j, color, 0, -1) > 0) return true;
@@ -100,6 +106,7 @@ namespace Othello.Models
             return false;
         }
 
+        // Counts how many opponent disks would be flipped in a given direction
         private int CountFlips(int i, int j, string color, int di, int dj)
         {
             string opp = (color == "Black") ? "White" : "Black";
@@ -107,7 +114,7 @@ namespace Othello.Models
             int jj = j + dj;
             int count = 0;
 
-            // första måste vara motståndare
+            
             if (!Inside(ii, jj) || board[ii, jj] != opp)
                 return 0;
 
@@ -124,6 +131,7 @@ namespace Othello.Models
             return count;
         }
 
+        // Flips opponent disks in a given direction after a move
         private bool FlipDirection(int i, int j, string color, int di, int dj)
         {
             int flips = CountFlips(i, j, color, di, dj);
@@ -142,6 +150,7 @@ namespace Othello.Models
             return true;
         }
 
+        // Checks if the given position is inside the board boundaries
         private bool Inside(int i, int j)
         {
             return i >= 0 && i < Size && j >= 0 && j < Size;

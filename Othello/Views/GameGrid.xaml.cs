@@ -11,11 +11,13 @@ namespace Othello.Views
     {
         public event Action<int, int> TileClicked;
 
+        // Initializes a new instance of the GameGrid class
         public GameGrid()
         {
             InitializeComponent();
         }
 
+        // Renders the game board on the grid
         public void Render(GameBoard board)
         {
             GridBoard.Children.Clear();
@@ -59,6 +61,7 @@ namespace Othello.Views
             }
         }
 
+        // Handles the click event for a tile button
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;

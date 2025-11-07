@@ -15,6 +15,7 @@ namespace Othello.Controllers
         public event Action<Player> CurrentPlayerChanged;
         public event Action<string> GameEnded;
 
+        // Start a new game with 2 players
         public void StartNewGame(Player black, Player white)
         {
             BlackPlayer = black;
@@ -28,6 +29,7 @@ namespace Othello.Controllers
             OnCurrentPlayerChanged(CurrentPlayer);
         }
 
+        // Do the next move in the game
         public bool NextTurn()
         {
             if (IsGameOver) return false;
@@ -72,12 +74,14 @@ namespace Othello.Controllers
             return true;
         }
 
+        // Get the player who isn't current
         private Player Other(Player p)
         {
             if (p == BlackPlayer) return WhitePlayer;
             return BlackPlayer;
         }
 
+        // Check if board is full or nobody can move
         private bool IsBoardFullOrNoMoves()
         {
             bool hasEmpty = false;
@@ -106,6 +110,7 @@ namespace Othello.Controllers
             return false;
         }
 
+        // Count pieces and see who won
         private void FinishGame()
         {
             IsGameOver = true;
@@ -142,16 +147,19 @@ namespace Othello.Controllers
             OnGameEnded(result);
         }
 
+        // Tell everyone the board changed
         private void OnBoardUpdated()
         {
             if (BoardUpdated != null) BoardUpdated();
         }
 
+        // Tell everyone it's a new player's turn
         private void OnCurrentPlayerChanged(Player p)
         {
             if (CurrentPlayerChanged != null) CurrentPlayerChanged(p);
         }
 
+        // Tell everyone the game ended
         private void OnGameEnded(string message)
         {
             if (GameEnded != null) GameEnded(message);

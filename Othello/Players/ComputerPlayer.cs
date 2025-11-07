@@ -7,10 +7,12 @@ namespace Othello.Models
     {
         private static readonly Random rng = new Random();
 
+        // Make a new computer player
         public ComputerPlayer(string name, string color) : base(name, color)
         {
         }
 
+        // Pick a random move from the valid moves
         public override Move? RequestMove(GameBoard board, List<Move> validMoves)
         {
             if (validMoves == null) return null;
